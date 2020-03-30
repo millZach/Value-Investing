@@ -5,8 +5,6 @@ import datetime
 import json
 import time
 from data.data_to_json import JSONEncoder
-# pd.set_option('display.max_colwidth', None)
-# pd.set_option('display.max_columns', None)
 
 
 def get_sp500_companies():
@@ -15,21 +13,42 @@ def get_sp500_companies():
         request = requests.get(url)
         grab_sp500_data = pd.read_html(url)[0].set_index('Symbol')
         sp500_df = grab_sp500_data[['Security']]
-        tickers = []
-        display = []
-        dropdown_dict = {}
-        i = 0
-        for index in sp500_df.index:
-            tickers.append(index)
-            display.append(index + ' - ' + sp500_df.Security.values[i])
-            i += 1
-
-        dropdown_dict = {'value': tickers, 'label': display}
-
-        return dropdown_dict
-
-    except requests.ConnectionError:
+        return sp500_df
+    except:
         print("There was an error with trying to connect to the URL")
+
+
+def sp500_dropdown():
+    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    try:
+        request = requests.get(url)
+        grab_sp500_data = pd.read_html(url)[0].set_index('Symbol')
+        sp500_df = grab_sp500_data[['Security']]
+
+        dict_list = []
+        for index, row in sp500_df.iterrows():
+            dict_list.append(
+                {'value': index, 'label': f"{index} - {row['Security']}"})
+        return dict_list
+
+    except:
+        print("There was an error with trying to connect to the URL")
+
+
+def good_comp_dropdown():
+
+    with open('data/warren_companies.json', 'r') as f:
+        warren_ticks = json.load(f)
+
+    sp500_dict_lst = sp500_dropdown()
+    dict_list = []
+
+    for dic in sp500_dict_lst:
+        for tic in warren_ticks['goodCompanies']:
+            if tic == dic['value']:
+                dict_list.append({'value': tic, 'label': dic['label']})
+
+    return dict_list
 
 
 def profile(ticker):

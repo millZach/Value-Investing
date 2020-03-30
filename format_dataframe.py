@@ -19,6 +19,9 @@ def format_df(lst):
                 # Then please make it into comma float
                 endtext = float(text[:-1].replace(",", "")
                                 ) / 100.0 * posornegnumber
+            elif text.endswith('T'):
+                endtext = int(float(text[:-1].replace(",", ""))
+                              * 1000000000000) * posornegnumber
             elif text.endswith('B'):
                 # Then please times 1000000000
                 # Change it into integer
@@ -37,6 +40,10 @@ def format_df(lst):
             elif text.endswith('-'):
                 # Insert 0
                 endtext = 0
+
+            elif text == 'N/A':
+                endtext = 0
+
             else:
                 # change to float
                 endtext = float(text) * posornegnumber
