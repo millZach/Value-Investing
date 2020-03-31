@@ -67,11 +67,11 @@ def warren_companies(sp500_df):
         json.dump(save_tickers, f)
 
 
-with open('data/warren_companies.json', 'r') as f:
-    b = json.load(f)
+# with open('data/warren_companies.json', 'r') as f:
+#     b = json.load(f)
 
-dict_list = []
-for dic in a:
-    for tic in b['goodCompanies']:
-        if tic == dic['value']:
-            dict_list.append({'value': tic, 'label': dic['label']})
+# dict_list = []
+# for dic in a:
+#     for tic in b['goodCompanies']:
+#         if tic == dic['value']:
+#             dict_list.append({'value': tic, 'label': dic['label']})

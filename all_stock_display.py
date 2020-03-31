@@ -4,13 +4,20 @@ import pandas as pd
 import pandas_datareader as web
 import datetime
 from dateutil.relativedelta import relativedelta
-pd.set_option('display.max_columns', None)
+import time
+import json
+# pd.set_option('display.max_columns', None)
 
 
 def stock_price_data(ticker):
-    end_date = datetime.date.today()
-    start_date = end_date - relativedelta(years=5)
-    df = web.DataReader(ticker, 'yahoo', start_date, end_date)
+    try:
+        end_date = datetime.date.today()
+        start_date = end_date - relativedelta(years=5)
+        df = web.DataReader(ticker, 'yahoo', start_date, end_date)
+
+    except:
+        df = pd.DataFrame(
+            {'Close': 100000, 'Adj Close': 100000}, index=[ticker])
 
     return df
 
@@ -23,7 +30,7 @@ def display_profile(ticker):
     return profile_df
 
 
-def display_annual_finacials(ticker):
+def display_annual_financials(ticker):
 
     # scraping annual finicial data from marketwatch
     annual_df = ws.annual_data(ticker)
@@ -68,7 +75,9 @@ def display_quarterly_financials(ticker):
     return quarterly_df
 
 
-def warning_signs(ticker, annual_df, profile_df):
+def warning_signs(ticker):
+    annual_df = display_annual_financials(ticker)
+    profile_df = ws.profile(ticker)
 
     annual_df = annual_df.apply(format_df)
     profile_df = profile_df.apply(format_df)
@@ -103,14 +112,17 @@ def warning_signs(ticker, annual_df, profile_df):
     return warning_flags
 
 
-def present_value_calc(ticker, price_df, profile_df, annual_df, discount_rate=0.20, margin_safety=0.15):
+def present_value_calc(ticker, discount_rate=0.20, margin_safety=0.15):
+    annual_df = ws.annual_data(ticker)
+    profile_df = ws.profile(ticker)
+    price_df = stock_price_data(ticker)
 
     annual_df = annual_df.apply(format_df).T
     profile_df = profile_df.apply(format_df).T
     estimation_dict = {}
 
     # Calculating Annual Compounded Growth Rate of EPS
-    if all(annual_df['EPS (Basic)'] > 0):
+    if all(annual_df['EPS (Basic)'] != 0):
         present_eps = annual_df['EPS (Basic)'][-1]
         past_eps = annual_df['EPS (Basic)'][0]
 
@@ -125,7 +137,7 @@ def present_value_calc(ticker, price_df, profile_df, annual_df, discount_rate=0.
         estimation_dict['Future EPS'] = round(future_eps, 2)
 
         # Estimating future value of company price 5 years from now
-        if all(profile_df['P/E Ratio'] > 0):
+        if all(profile_df['P/E Ratio'] != 0):
             price_earnings = profile_df['P/E Ratio'][0]
             future_value = future_eps * price_earnings
 
@@ -159,16 +171,40 @@ def present_value_calc(ticker, price_df, profile_df, annual_df, discount_rate=0.
     return estimation_df
 
 
-ticker = 'SNA'
-profile_df = display_profile(ticker)
-annual_df = display_annual_finacials(ticker)
-price_df = stock_price_data(ticker)
-warning = warning_signs(ticker, annual_df, profile_df)
-prediction = present_value_calc(
-    ticker, price_df, profile_df, annual_df, discount_rate=0.20, margin_safety=0.15)
+# with open('data/warren_companies.json', 'r') as f:
+#     ticker_dict = json.load(f)
 
-print(profile_df)
-print(annual_df)
-print(price_df)
-print(warning)
-print(prediction)
+# tickers = ticker_dict['goodCompanies']
+# buy_lst = []
+
+# for ticker in tickers:
+#     profile_df = display_profile(ticker)
+#     annual_df = display_annual_financials(ticker)
+#     price_df = stock_price_data(ticker)
+#     warning = warning_signs(ticker, annual_df, profile_df)
+#     prediction = present_value_calc(
+#         ticker, price_df, profile_df, annual_df, discount_rate=0.20, margin_safety=0.15)
+
+#     print(ticker)
+#     if prediction['Buy or Sell'][0] == 'Buy':
+#         buy_lst.append(prediction)
+#         print(prediction)
+#         time.sleep(2)
+
+
+# print(buy_lst)
+
+# ticker = 'Axp'
+# profile_df = display_profile(ticker)
+# annual_df = display_annual_financials(ticker)
+# price_df = stock_price_data(ticker)
+# warning = warning_signs(ticker, annual_df, profile_df)
+# prediction = present_value_calc(
+#     ticker, price_df, profile_df, annual_df, discount_rate=0.20, margin_safety=0.15)
+
+# # print(profile_df)
+# # print(annual_df)
+# # print(price_df)
+
+# print(warning)
+# # print(prediction)
