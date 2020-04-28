@@ -7,32 +7,14 @@ import time
 from data.data_to_json import JSONEncoder
 
 
-def get_sp500_companies():
-    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-    try:
-        request = requests.get(url)
-        grab_sp500_data = pd.read_html(url)[0].set_index('Symbol')
-        sp500_df = grab_sp500_data[['Security']]
-        return sp500_df
-    except:
-        print("There was an error with trying to connect to the URL")
+def russel_3000():
+    df = pd.read_excel('data/Russel_3000.xlsx').set_index('Ticker')
 
-
-def sp500_dropdown():
-    url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-    try:
-        request = requests.get(url)
-        grab_sp500_data = pd.read_html(url)[0].set_index('Symbol')
-        sp500_df = grab_sp500_data[['Security']]
-
-        dict_list = []
-        for index, row in sp500_df.iterrows():
-            dict_list.append(
-                {'value': index, 'label': f"{index} - {row['Security']}"})
-        return dict_list
-
-    except:
-        print("There was an error with trying to connect to the URL")
+    dict_list = []
+    for index, row in df.iterrows():
+        dict_list.append({'value': index, 'label': f"{index} - {row['Company'][0]}{row['Company'].lower()[1:]}"})
+    
+    return dict_list
 
 
 def good_comp_dropdown():
@@ -341,28 +323,29 @@ def quarterly_data(ticker):
 
 
 if __name__ == '__main__':
-    start_time = time.time()
+    print(russel_3000())
+    # start_time = time.time()
 
-    sp_500_dict = get_sp500_companies()
-    tickers = sp_500_dict['value']
-    # tickers = ['aapl', 'wrk', 'tsla']
-    stock_dict = {}
-    i = 1
-    for ticker in tickers:
-        print(ticker + ' ' + f'{i}')
-        stock_dict[f'{ticker}'] = [
-            profile(ticker),
-            annual_data(ticker),
-            quarterly_data(ticker)
-        ]
+    # sp_500_dict = get_sp500_companies()
+    # tickers = sp_500_dict['value']
+    # # tickers = ['aapl', 'wrk', 'tsla']
+    # stock_dict = {}
+    # i = 1
+    # for ticker in tickers:
+    #     print(ticker + ' ' + f'{i}')
+    #     stock_dict[f'{ticker}'] = [
+    #         profile(ticker),
+    #         annual_data(ticker),
+    #         quarterly_data(ticker)
+    #     ]
 
-        with open('data/sp500_updated.json', 'w') as fp:
-            json.dump(stock_dict, fp, cls=JSONEncoder)
+    #     with open('data/sp500_updated.json', 'w') as fp:
+    #         json.dump(stock_dict, fp, cls=JSONEncoder)
 
-        print("--- %s seconds ---" % (time.time() - start_time))
-        print(stock_dict[f'{ticker}'][1].head())
-        i += 1
-        time.sleep(5)
-    # print(stock_dict['tsla'])
+    #     print("--- %s seconds ---" % (time.time() - start_time))
+    #     print(stock_dict[f'{ticker}'][1].head())
+    #     i += 1
+    #     time.sleep(5)
+    # # print(stock_dict['tsla'])
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+    # print("--- %s seconds ---" % (time.time() - start_time))

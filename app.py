@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from pandas_datareader import data as web
 import all_stock_display as asd
-from web_scraper import sp500_dropdown
+from web_scraper import russel_3000
 from dash.dependencies import Input, Output
 
 
@@ -28,10 +28,13 @@ app.layout = html.Div(
                         html.H1('Choose A Company', style={'font-size': '36px'}),
                         dcc.Dropdown(
                             id='company-dropdown',
-                            options=sp500_dropdown() + [{'value': 'SPY', 'label': 'SPY - ETF'}],
+                            options=russel_3000(),
                             value='AAPL',
                             ),
-                        dcc.Graph(id='stock-price')
+                        dcc.Graph(id='stock-price'),
+
+                        html.H1('Company Profile', style={'font-size': '40px'}),
+                        html.Table(id='profile-table')
                     ],
                     style={'float': 'left','width': '50%', 'display': 'inline-block'}),
 
@@ -39,31 +42,13 @@ app.layout = html.Div(
                     className='col-md-6',
                     children=[
                         html.H1('Annual Financials', style={'font-size': '40px'}),
-                        html.Table(id='annual-table')],
-                        style={'float': 'left','width': '45%', 'display': 'inline-block', 'padding-top': '10px', 'padding-left': '30px',}
-                    )]),
-        html.Div(
-            className='row',
-            children=[
-                html.Div(
-                    className='col-md-6',
-                    children=[
-                        html.H1('Company Profile', style={'font-size': '40px'}),
-                        html.Table(id='profile-table')],
-                    style={'float': 'left', 'width': '50%', 'padding-top': '10px', 'display': 'inline-block'}
-                    ),
-
-                html.Div(
-                    className='col-md-6',
-                    children=[
+                        html.Table(id='annual-table'),
                         html.H1('Warning Flags', style={'font-size': '40px'}),
                         html.Table(id='warning-signs'),
                         html.H1('Price Prediction', style={'font-size': '40px', 'padding-top': '10px'}),
                         html.Table(id='price-prediction')],
-                    style={'float': 'left', 'width': '45%', 'padding-top': '10px', 'padding-left':'30px', 'display': 'inline-block'}
-                    )
-                ]
-            ),
+                        style={'float': 'left','width': '45%', 'display': 'inline-block', 'padding-top': '10px', 'padding-left': '30px',}
+                    )]),
 
     ],
 
